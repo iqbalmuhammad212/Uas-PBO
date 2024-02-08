@@ -1,0 +1,157 @@
+package pegawai;
+
+import java.util.Scanner;
+
+// Interface untuk menghitung gaji
+interface Gaji {
+    double hitungGaji();
+}
+
+// Class Pegawai sebagai parent class
+class Pegawai implements Gaji {
+    protected String kode;
+    protected String nama;
+    protected double gajiPokok;
+    protected double transport;
+    protected double lemburPerJam;
+    protected double tunjanganIstri;
+    protected double tunjanganAnak;
+    protected int jamMasuk;
+    protected int jamKeluar;
+    protected int jumlahAnak; // tambahan jumlah anak
+
+    public Pegawai(String kode, String nama, double gajiPokok, double transport, double lemburPerJam, double tunjanganIstri, double tunjanganAnak) {
+        this.kode = kode;
+        this.nama = nama;
+        this.gajiPokok = gajiPokok;
+        this.transport = transport;
+        this.lemburPerJam = lemburPerJam;
+        this.tunjanganIstri = tunjanganIstri;
+        this.tunjanganAnak = tunjanganAnak;
+    }
+
+    public double hitungGaji() {
+        double gajiTotal = gajiPokok + transport + hitungLembur() + hitungTunjangan();
+
+        // Pengurangan gaji pokok berdasarkan keterlambatan dan kekurangan jam kerja
+        gajiTotal -= 100000 * Math.max(jamMasuk - 7, 0);
+        gajiTotal -= 100000 * Math.max(16 - jamKeluar, 0);
+
+        // Gaji pokok tidak boleh kurang dari 0
+        gajiTotal = Math.max(gajiTotal, 0);
+
+        System.out.println("Total gaji " + getNama() + ": " + gajiTotal);
+        return gajiTotal;
+    }
+
+    public double hitungLembur() {
+        int lembur = Math.max(jamKeluar - 16, 0) + Math.max(7 - jamMasuk, 0);
+        return lembur * lemburPerJam;
+    }
+
+    public double hitungTunjangan() {
+        return tunjanganIstri + (jumlahAnak > 1 ? tunjanganAnak * jumlahAnak : tunjanganAnak); // modifikasi perhitungan tunjangan anak
+    }
+
+    public String getKode() {
+        return kode;
+    }
+
+    public String getNama() {
+        return nama;
+    }
+
+    public void setJamMasuk(int jamMasuk) {
+        this.jamMasuk = jamMasuk;
+    }
+
+    public void setJamKeluar(int jamKeluar) {
+        this.jamKeluar = jamKeluar;
+    }
+
+    public void setJumlahAnak(int jumlahAnak) { // tambahan setter jumlah anak
+        this.jumlahAnak = jumlahAnak;
+    }
+}
+
+// Class Supervisor sebagai turunan dari Pegawai
+class Supervisor extends Pegawai {
+    public Supervisor(String nama) {
+        super("SPV", nama, 10000000, 1000000, 10000, 300000, 100000);
+    }
+}
+
+// Class HRD sebagai turunan dari Pegawai
+class HRD extends Pegawai {
+    public HRD(String nama) {
+        super("HRD", nama, 5000000, 750000, 7500, 250000, 90000);
+    }
+}
+
+// Class Teknisi sebagai turunan dari Pegawai
+class Teknisi extends Pegawai {
+    public Teknisi(String nama) {
+        super("TKN", nama, 3000000, 500000, 5000, 200000, 75000);
+    }
+}
+
+// Class Karyawan sebagai turunan dari Pegawai
+class Karyawan extends Pegawai {
+    public Karyawan(String nama) {
+        super("KRY", nama, 1500000, 250000, 5000, 200000, 60000);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Masukkan nama pegawai: ");
+        String namaPegawai = scanner.nextLine();
+
+        System.out.print("Masukkan kode pegawai (SPV/HRD/TKN/KRY): ");
+        String kodePegawai = scanner.nextLine().toUpperCase();
+
+        System.out.print("Masukkan jam masuk pegawai: ");
+        int jamMasuk = scanner.nextInt();
+
+        System.out.print("Masukkan jam keluar pegawai: ");
+        int jamKeluar = scanner.nextInt();
+
+        System.out.print("Masukkan jumlah anak: "); // tambahan input jumlah anak
+        int jumlahAnak = scanner.nextInt();
+
+        // Pemrosesan gaji berdasarkan jenis pegawai
+        Pegawai pegawai;
+        switch (kodePegawai) {
+            case "SPV":
+                pegawai = new Supervisor(namaPegawai);
+                break;
+
+            case "HRD":
+                pegawai = new HRD(namaPegawai);
+                break;
+
+            case "TKN":
+                pegawai = new Teknisi(namaPegawai);
+                break;
+
+            case "KRY":
+                pegawai = new Karyawan(namaPegawai);
+                break;
+
+            default:
+                System.out.println("Kode pegawai tidak valid.");
+                return;
+        }
+
+        pegawai.setJamMasuk(jamMasuk);
+        pegawai.setJamKeluar(jamKeluar);
+        pegawai.setJumlahAnak(jumlahAnak); // tambahan set jumlah anak
+
+        // Hitung gaji
+        pegawai.hitungGaji();
+
+        scanner.close();
+    }
+}
