@@ -18,7 +18,7 @@ class Pegawai implements Gaji {
     protected double tunjanganAnak;
     protected int jamMasuk;
     protected int jamKeluar;
-    protected int jumlahAnak; // tambahan jumlah anak
+    protected int jumlahAnak;
 
     public Pegawai(String kode, String nama, double gajiPokok, double transport, double lemburPerJam, double tunjanganIstri, double tunjanganAnak) {
         this.kode = kode;
